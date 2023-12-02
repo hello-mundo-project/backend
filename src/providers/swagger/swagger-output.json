@@ -1,0 +1,931 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "2.9.2",
+    "title": "REST API",
+    "description": ""
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
+  ],
+  "paths": {
+    "/api/account/email-duplicate": {
+      "post": {
+        "summary": "이메일 중복 확인",
+        "description": "이메일 중복확인",
+        "tags": ["Account"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "rjay24@naver.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/signup": {
+      "post": {
+        "summary": "회원가입",
+        "description": "회원가입",
+        "tags": ["Account"],
+        "responses": {
+          "200": { "description": "회원 가입이 완료되었습니다" },
+          "409": { "description": "중복된 이메일 주소" },
+          "400": { "description": "요청 값 불량" }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "r1234@naver.com",
+                    "description": "사용자 이메일"
+                  },
+                  "check_email": {
+                    "type": "string",
+                    "example": "aaaa23@naver.com",
+                    "description": "사용자 이메일"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "abcd1234!",
+                    "description": "비밀번호"
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "example": "박용택",
+                    "description": "닉네임"
+                  },
+                  "career_id": {
+                    "type": "ObjectId",
+                    "example": "655ccbf52c838438d0e1a80a",
+                    "description": "닉네임"
+                  },
+                  "annual": {
+                    "type": "number",
+                    "example": 0,
+                    "description": "연차"
+                  },
+                  "skill_id": {
+                    "type": "array",
+                    "description": "기술스택",
+                    "items": {
+                      "type": "ObjectId",
+                      "example": "655ceb2d01b47f6b813d4a8b",
+                      "description": "기술ID"
+                    }
+                  }
+                },
+                "required": ["email", "check_email", "password", "nickname", "career_id", "annual", "skill_id"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/login": {
+      "post": {
+        "summary": "로그인",
+        "tags": ["Account"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "rad",
+                    "description": "사용자 이메일"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "1234",
+                    "description": "비밀번호"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Login successful",
+                  "accessToken": "your_access_token_value"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "Authentication token",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증 실패",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Unauthorized",
+                  "message": "인증 실패"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/change-password/{id}": {
+      "put": {
+        "summary": "비번 변경",
+        "description": "",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "adf"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "형식 불량"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "example": ""
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/logout": {
+      "post": {
+        "summary": "로그아웃",
+        "tags": ["Account"],
+        "responses": {
+          "200": {
+            "description": "로그아웃 성공",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": 200,
+                  "message": "로그아웃 성공"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/career": {
+      "get": {
+        "summary": "모든 직무 조회",
+        "description": "모든 직무 조회",
+        "tags": ["Career"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "직무 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "직무명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/career/{careerName}": {
+      "get": {
+        "summary": "직무명으로 조회",
+        "description": "직무명으로 조회",
+        "tags": ["Career"],
+        "parameters": [
+          {
+            "name": "careerName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "직무 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "직무명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category": {
+      "get": {
+        "summary": "모집구분 전체 검색",
+        "description": "모집구분 전체 검색",
+        "tags": ["Category"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "모집구분 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "모집구분명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{categoryName}": {
+      "get": {
+        "summary": "모집구분명 검색",
+        "description": "모집구분명 검색",
+        "tags": ["Category"],
+        "parameters": [
+          {
+            "name": "categoryName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "모집구분 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "모집구분명"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 값 불량"
+          }
+        }
+      }
+    },
+
+    "/api/city": {
+      "get": {
+        "summary": "모든 도시 검색",
+        "description": "모든 도시 검색",
+        "tags": ["City"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "도시 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "도시 명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/city/{cityName}": {
+      "get": {
+        "summary": "도시명으로 검색",
+        "description": "도시명으로 검색",
+        "tags": ["City"],
+        "parameters": [
+          {
+            "name": "cityName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "도시 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "도시 명"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 값 불량"
+          }
+        }
+      }
+    },
+    "/api/district/{cityId}": {
+      "get": {
+        "summary": "도시ID로 도시 내 지역 검색",
+        "description": "도시ID로 도시 내 지역 검색",
+        "tags": ["district"],
+        "parameters": [
+          {
+            "name": "cityId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "city_id": {
+                      "type": "ObjectId",
+                      "description": "도시 ID"
+                    },
+                    "_id": {
+                      "type": "string",
+                      "description": "시내 지역 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "시내 지역 명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/skillCategory": {
+      "get": {
+        "summary": "모든 기술 카테고리 검색",
+        "description": "모든 기술 카테고리 검색",
+        "tags": ["SkillCategory"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "기술 카테고리 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "기술 카테고리명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/skillCategory/{skillCategoryName}": {
+      "get": {
+        "summary": "기술 카테고리 이름으로 검색",
+        "description": "기술 카테고리 이름으로 검색",
+        "tags": ["SkillCategory"],
+        "parameters": [
+          {
+            "name": "skillCategoryName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "기술 카테고리 ID"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "기술 카테고리 명"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "요청 값 불량"
+          }
+        }
+      }
+    },
+
+    "/api/skill": {
+      "get": {
+        "summary": "모든 기술  검색",
+        "description": "모든 기술  검색",
+        "tags": ["Skill"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "skillCategory_id": {
+                      "type": "ObjectId",
+                      "description": "기술 카테고리 ID"
+                    },
+
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "기술 ID"
+                    },
+
+                    "name": {
+                      "type": "string",
+                      "description": "기술명"
+                    },
+                    "user_id": {
+                      "type": "ObjectId",
+                      "description": "소유 유저 ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/skill/{skillCategoryName}": {
+      "get": {
+        "summary": "카테고리 이름으로 기술 검색",
+        "description": "카테고리 이름으로 기술  검색",
+        "tags": ["Skill"],
+        "parameters": [
+          {
+            "name": "skillCategoryName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "기술 ID"
+                    },
+
+                    "name": {
+                      "type": "string",
+                      "description": "기술명"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/user/bookmark": {
+      "get": {
+        "description": "",
+        "tags": ["User"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/user/bookmark/{categoryName}": {
+      "get": {
+        "description": "",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "categoryName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/user/myprofile/{id}": {
+      "get": {
+        "summary": "정보 조회",
+        "description": "",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "ObjectId",
+                      "description": "유저 ID"
+                    },
+                    "email": {
+                      "type": "string",
+                      "description": "유저 이메일"
+                    },
+                    "nickname": {
+                      "type": "string",
+                      "description": "유저 닉네임"
+                    },
+                    "check_email": {
+                      "type": "string",
+                      "description": "확인 이메일"
+                    },
+                    "annual": {
+                      "type": "number",
+                      "description": "연차"
+                    },
+                    "introduce": {
+                      "type": "string",
+                      "description": "자기소개"
+                    },
+                    "isSocial": {
+                      "type": "boolean",
+                      "description": "소셜"
+                    },
+                    "deletedAt": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "탈퇴일자"
+                    },
+                    "career_id": {
+                      "type": "object",
+                      "description": "직무",
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "description": "직무ID"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "직무이름"
+                        },
+                        "__v": {
+                          "type": "number",
+                          "description": "모름"
+                        }
+                      }
+                    },
+                    "skill_id": {
+                      "type": "array",
+                      "description": "기술스택",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string",
+                            "description": "기술ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "기술이름"
+                          },
+                          "isCustom": {
+                            "type": "boolean",
+                            "description": "커스텀 여부"
+                          },
+                          "user_id": {
+                            "type": "string",
+                            "description": "보유자 이름"
+                          },
+                          "skillCategory_id": {
+                            "type": "string",
+                            "description": "기술카테고리 id"
+                          },
+                          "__v": {
+                            "type": "number",
+                            "description": "몰라"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "탈퇴한 회원"
+          },
+          "409": {
+            "description": "조회 실패"
+          }
+        }
+      }
+    },
+    "/api/user/modify": {
+      "put": {
+        "summary": "정보 수정",
+        "description": "정보 수정",
+        "tags": ["User"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "요청 불량"
+          },
+          "409": {
+            "description": "수정 실패"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "ObjectId",
+                    "description": "유저 ID"
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "description": "유저 닉네임"
+                  },
+                  "annual": {
+                    "type": "number",
+                    "description": "연차"
+                  },
+                  "introduce": {
+                    "type": "string",
+                    "description": "자기소개"
+                  },
+                  "career_id": {
+                    "type": "string",
+                    "description": "직무"
+                  },
+                  "skill_id": {
+                    "type": "array",
+                    "description": "기술스택",
+                    "items": {
+                      "type": "ObjectId",
+                      "description": "기술ID"
+                    }
+                  },
+                  "newSkillArray": {
+                    "type": "array",
+                    "description": "기술스택",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "description": "기술ID"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "기술이름"
+                        },
+                        "skillCategory_id": {
+                          "type": "string",
+                          "description": "기술카테고리 id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["nickname", "annual", "introduce", "carrer_id"]
+        }
+      }
+    },
+    "/api/user/withdraw": {
+      "put": {
+        "summary": "회원 탈퇴",
+        "description": "회원 탈퇴",
+        "tags": ["User"],
+        "responses": {
+          "204": {
+            "description": "탈퇴 성공"
+          },
+          "500": {
+            "description": "탈퇴 실패"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "ObjectId",
+                "properties": {
+                  "_id": {
+                    "type": "ObjectId",
+                    "description": "유저ID"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/find-password": {
+      "post": {
+        "description": "비번 찾기",
+        "summary": "비번 찾기",
+        "tags": ["User"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
